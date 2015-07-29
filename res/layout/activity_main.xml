@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:orientation="vertical" >
+
+    <com.almas.mtc.MTC
+        android:id="@+id/editIndicText2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:ems="10"
+        android:gravity="top|center_vertical"
+        android:hint="Mongolian text"
+        android:text="@string/init_text"
+        android:textAlignment="gravity" >
+
+        <requestFocus />
+    </com.almas.mtc.MTC>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" />
+
+</LinearLayout>
+

@@ -1,0 +1,1 @@
+javah -classpath bin\classes;C:\Users\aron\android-sdks\platforms\android-19\android -d jni com.almas.mtc.MTC
