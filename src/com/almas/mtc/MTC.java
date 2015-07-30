@@ -4,9 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.drawable.PaintDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.EditText;
 
 public class MTC extends EditText {
@@ -56,6 +61,15 @@ public class MTC extends EditText {
 
 		if(mBmp != null)
 			canvas.drawBitmap(mBmp, this.getPaddingLeft(), getPaddingTop(), null);
+		
+		if(mCursorPos != null)
+		{
+			Paint p = new Paint();
+			p.setColor(Color.BLUE);
+			
+			canvas.drawLine(mCursorPos.x, mCursorPos.y, mCursorPos.x + 50, mCursorPos.y, p);
+			canvas.drawLine(mCursorPos.x, mCursorPos.y+1, mCursorPos.x + 50, mCursorPos.y+1, p);
+		}
 	}
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -74,6 +88,18 @@ public class MTC extends EditText {
 		}
     	//checkLineEnd();
     }
+private Point mCursorPos;
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// TODO Auto-generated method stub
+		mCursorPos = new Point();
+		mCursorPos.x = (int) event.getX();
+		mCursorPos.y = (int) event.getY();
+		
+		
+		return super.onTouchEvent(event);
+	}
+
 	class MyTextWatcher implements TextWatcher
 	{
 
