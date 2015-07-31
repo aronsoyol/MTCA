@@ -150,12 +150,24 @@ public class MTC extends EditText {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
+		
+		int x = (int) event.getX() - getPaddingLeft();
+		int y = (int) event.getY() - getPaddingTop();
+		
+		int charPos = nativeLayoutGetCharPosition(mNativeLayout, x, y);
+		Log.v("MTC", String.format("x=%d,y=%d,pos=%d",x, y,charPos));
+		boolean trailing = (charPos & 0x80000000) != 0;
+		charPos &= 0X7FFFFFFF;
+		
+		long charLoc = nativeLayoutGetCharLocation(mNativeLayout, charPos, trailing);
+		
 		mCursorPos = new Point();
-		mCursorPos.x = (int) event.getX();
-		mCursorPos.y = (int) event.getY();
-		
-		
-		return super.onTouchEvent(event);
+		mCursorPos.y = (int)(charLoc & 0x0FFFFFFFFL) + getPaddingTop();
+		mCursorPos.x = (int)((charLoc & 0xFFFFFFFF00000000L) >>> 32) + getPaddingLeft();
+		Log.v("MTC", String.format("p=%d,t=%d,touchX=%d,touchY=%d,charX=%d,charY=%d", charPos, trailing?1:0, x, y, mCursorPos.x, mCursorPos.y));
+		boolean ret = super.onTouchEvent(event);
+		setSelection(charPos + (trailing ? 1 : 0));
+		return ret;
 	}
 
 	class MyTextWatcher implements TextWatcher
