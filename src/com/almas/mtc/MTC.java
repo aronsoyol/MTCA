@@ -154,10 +154,21 @@ public class MTC extends EditText {
 		int x = (int) event.getX() - getPaddingLeft();
 		int y = (int) event.getY() - getPaddingTop();
 		
+		// 从坐标获取 字符位置， charPos 的 最高位 表示 trailing 
+		// 什么是trailing？
+		//，当前坐标位置是 字符的上半部分的话 trailing为false
+		//下半部分的话trailing 为true
 		int charPos = nativeLayoutGetCharPosition(mNativeLayout, x, y);
+		
 		Log.v("MTC", String.format("x=%d,y=%d,pos=%d",x, y,charPos));
 		boolean trailing = (charPos & 0x80000000) != 0;
+		
+		// 经过这个操作以后才是真正的字符位置
 		charPos &= 0X7FFFFFFF;
+		
+		
+		// 64位的long 类型返回值的 高32位表示x坐标
+		//低32表示 y坐标
 		
 		long charLoc = nativeLayoutGetCharLocation(mNativeLayout, charPos, trailing);
 		
