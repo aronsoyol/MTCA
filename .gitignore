@@ -12,6 +12,7 @@
 bin/
 gen/
 obj/
+obj/*
 
 # generated header files
 jni/com_almas_mtc_MTC.h
