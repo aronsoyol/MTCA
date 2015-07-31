@@ -2,18 +2,20 @@ package com.almas.mtc;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.drawable.PaintDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.PopupWindow;
 
 public class MTC extends EditText {
 	static {
@@ -29,6 +31,10 @@ public class MTC extends EditText {
 	@SuppressLint("UseValueOf")
 	private Boolean lock = new Boolean(true);
 	
+	// add by he
+	private final PopupWindow mCursor;
+	private CursorController cursorController = new CursorController();
+	
 	public MTC(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.addTextChangedListener(new MyTextWatcher() );
@@ -40,6 +46,10 @@ public class MTC extends EditText {
 		{
 			nativeLayoutSetText(mNativeLayout, text);
 		}
+		//add by he
+		View view = new View(context);
+		view.setBackgroundColor(Color.BLUE);
+		mCursor = new PopupWindow(view);
 	}
 	public MTC(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -52,6 +62,10 @@ public class MTC extends EditText {
 		{
 			nativeLayoutSetText(mNativeLayout, text);
 		}
+		//add by he
+		View view = new View(context);
+		view.setBackgroundColor(Color.BLUE);
+		mCursor = new PopupWindow(view);
 	}
 	public MTC(Context context) {
 		super(context);
@@ -64,6 +78,10 @@ public class MTC extends EditText {
 		{
 			nativeLayoutSetText(mNativeLayout, text);
 		}
+		//add by he
+		View view = new View(context);
+		view.setBackgroundColor(Color.BLUE);
+		mCursor = new PopupWindow(view);
 	}
 	
 	
@@ -204,5 +222,50 @@ public class MTC extends EditText {
 			// TODO Auto-generated method stub
 		}
 		
+	}
+	// add by he 
+	private class CursorController {
+		private static final int DELAY_BEFORE_FADE_OUT = 600;
+		private boolean showing = false;
+		int x;
+		int y;
+		private final Runnable mHider = new Runnable() {
+			@Override
+			public void run() {
+				if (showing) {
+					hide();
+				} else {
+					show(x, y);
+				}
+			}
+		};
+
+		CursorController() {
+		}
+
+		public void show(int x, int y) {
+			this.x = x;
+			this.y = y;
+			showing = true;
+			mCursor.showAtLocation(this, Gravity.NO_GRAVITY, x, y);
+			hideDelayed(DELAY_BEFORE_FADE_OUT);
+		}
+		public void hide() {
+			showing = false;
+			mCursor.dismiss();
+			removeCallbacks(mHider);
+			hideDelayed(DELAY_BEFORE_FADE_OUT);
+		}
+
+		private void hideDelayed(int msec) {
+			removeCallbacks(mHider);
+			postDelayed(mHider, msec);
+		}
+		public void stop() {
+			showing = false;
+			mCursor.dismiss();
+			removeCallbacks(mHider);
+		}
+
 	}
 }
