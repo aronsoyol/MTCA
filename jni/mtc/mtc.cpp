@@ -3,7 +3,6 @@
 
 void* mtc_font_create(int font_size, int fore, int back)
 {
-	__android_log_print(2, "mtc", "%s", "mtc_font_create - success");
 	MTC::Util::FontOption* font = new MTC::Util::FontOption(font_size, fore, back);
 	return (void*)font;
 }
@@ -19,7 +18,6 @@ int   mtc_font_line_height(void* font)
 #if defined(ANDROID)
 void*mtc_create_layout(JNIEnv* env, void* font)
 {
-	__android_log_print(2, "mtc", "%s", "mtc_create_layout - success");
 	MTC::LayoutEngine::ParaLayout * layout = new MTC::LayoutEngine::ParaLayout(env, (MTC::Util::FontOption*) font);
 	return layout;
 }
@@ -52,22 +50,19 @@ int mtc_get_char_position(const void* layout, int x, int y, unsigned char* trail
 {
 	bool t = false;
 	int pos = ((MTC::LayoutEngine::ParaLayout *)layout)->get_char_position(x, y, &t);
-	__android_log_print(2, "mtc", "mtc_get_char_position x=%d,y=%d,pos=%d,trailing=%d",x,y,pos,t ? 1 : 0);
+
 	*trailling = t ? 1 : 0;
 	return pos;
 }
 void mtc_get_char_location(const void* layout, int char_pos, unsigned char trailling, int* x, int* y)
 {
 	MTC::Util::Point point;
-	__android_log_print(2, "mtc", "mtc_get_char_location pos=%d,trailing=%d", char_pos, trailling);
 	if (((MTC::LayoutEngine::ParaLayout *)layout)->get_char_location(char_pos, trailling, &point))
 	{
-		__android_log_print(2, "mtc", "mtc_get_char_location1 x=%d,y=%d",(int)point.x, (int)point.y);
 		unsigned long ret = 0;
 		static_assert(sizeof(long) == 4, "size of long not eq 4");
 
 		*x = point.x;
 		*y = point.y;
-		__android_log_print(2, "mtc", "mtc_get_char_location2 x=%d,y=%d",*x, *y);
 	}
 }

@@ -171,13 +171,15 @@ namespace MTC{	namespace LayoutEngine{
 	int		ParaLayout::break_line(int max_line_width)
 	{
 		_line_list.clear();
-
+#if defined (ICU)
+		icu_breaker((const uint16_t*)&_text[0], _text.length(), _lineBreakList);
+#else
 #if defined (ANDROID)
 		jni_breaker(_jni_env, (const uint16_t*)&_text[0], _text.length(), _lineBreakList);
 #else
 		jni_breaker(jniLoader.env, (const uint16_t*)&_text[0], _text.length(), _lineBreakList);
 #endif
-
+#endif	
 		BreakVector::iterator itor = _lineBreakList.begin();
 		
 		for (; itor != _lineBreakList.end(); ++itor)
@@ -266,7 +268,12 @@ namespace MTC{	namespace LayoutEngine{
 
 	void	ParaLayout::shape()
 	{
-		glyph_list.reserve(_text.size());
+		glyph_list.clear();
+		char_width_list.clear();
+		if (glyph_list.capacity() < _text.length())
+		{
+			glyph_list.reserve(_text.size());
+		}
 		
 		int g_start = 0;
 		for (int i = 0; i < _run_list.size(); i++)

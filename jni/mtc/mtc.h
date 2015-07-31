@@ -4,7 +4,6 @@
 
 #if defined(ANDROID)
 #include <jni.h>
-#include <android/log.h>
 #endif
 
 

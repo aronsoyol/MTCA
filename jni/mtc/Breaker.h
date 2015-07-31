@@ -50,6 +50,7 @@ public:
 class JNIBreaker :public Breaker
 {
 	JNIEnv *_env;
+
 	jobject jnibreaker;
 	jclass clsBreakIterator;
 	jstring jtext;
