@@ -14,6 +14,10 @@ gen/
 obj/
 libs/
 
+# generated header files
+jni/com_almas_mtc_MTC.h
+jni/com_almas_mtc_MTC_MyTextWatcher.h
+
 # Local configuration file (sdk path, etc)
 local.properties
 
