@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	mtc/Breaker.cpp \
 	mtc/Canvas.cpp \
 	mtc/hb_draw.cpp \
+	mtc/mtc.cpp \
 	mtc/ParaLayout.cpp \
 	mtc/scrptitemizer.cpp \
 	mtc/utils.cpp

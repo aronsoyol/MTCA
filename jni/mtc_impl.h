@@ -15,6 +15,8 @@ extern "C" {
 jboolean mtcDrawToBitmap
 (JNIEnv * env, jobject thiz, jint textSize, jint width, jint height, jstring srcText, jobject lock);
 
+void mtcLayoutDrawBitmap(JNIEnv * env,jobject thiz,  void* layout, jint width, jint height, int x, int y, jobject lock);
+
 #ifdef __cplusplus
 }
 #endif

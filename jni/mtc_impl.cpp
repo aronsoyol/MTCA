@@ -11,10 +11,73 @@
 #include "mtc/util.h"
 #include "mtc/ParaLayout.h"
 #include "mtc_impl.h"
+#include "mtc/mtc.h"
+void mtcLayoutDrawBitmap
+(JNIEnv * env, jobject thiz, void* layout, jint width, jint height, jint x, jint y, jobject lock)
+{
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap entered width - %d, height - %d", width, height);
+	int buff_size = width * height;
+	std::vector<unsigned int> bitmap_buffer;
+	MTC::LayoutEngine::ParaLayout* pLayout = (MTC::LayoutEngine::ParaLayout *)layout;
+
+	bitmap_buffer.assign(buff_size, pLayout->back_color());
+
+	mtc_draw(layout, (unsigned int*)&bitmap_buffer[0], width, height, x, y);
+
+	jintArray intArray = (jintArray)env->NewIntArray( buff_size);
+	jint *arrayBody = env->GetIntArrayElements( intArray, 0);
+	for(int i = 0; i < buff_size; i++)
+	{
+		int col = arrayBody[i] & 0xffffff;
+		if(col != 0 && col != 0xFFFFFF)
+		{
+			__android_log_print(2, "mtcLayoutDrawBitmap", "col = %d", col);
+		}
+		arrayBody[i] = bitmap_buffer[i];
+	}
+
+//	jclass jclass ;
+//	jmethodID mid;
+	env->PushLocalFrame(256);
+	jclass cls = env->GetObjectClass( thiz);
+	jmethodID mid = env->GetMethodID( cls, "javaDrawToBitmap", "([III)V");
+	if (mid == 0) {
+		__android_log_print(2, "mtcLayoutDrawBitmap", "%s", "method drawBitmap - failed");
+		return ;
+	}
+	else
+	{
+		__android_log_print(2, "mtcLayoutDrawBitmap", "%s", "method drawBitmap - success");
+	}
+
+
+	env->ExceptionClear();
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - [%s]", "env->ExceptionClear()");
+//	env->MonitorEnter( lock);
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - [%s]", "env->MonitorEnter( lock)");
+	env->CallVoidMethod(thiz, mid, intArray, width, height);
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - env->CallVoidMethod(thiz, mid, intArray, width(%d), height(%d))", width, height);
+	env->ReleaseIntArrayElements( intArray, arrayBody, 0);
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - [%s]", "env->ReleaseIntArrayElements( intArray, arrayBody, 0)");
+	env->DeleteLocalRef(intArray);
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - [%s]", "env->DeleteLocalRef(intArray)");
+//	env->MonitorExit(lock);
+	__android_log_print(2, "mtc", "mtcLayoutDrawBitmap - [%s]", "env->MonitorExit(lock)");
+
+	env->DeleteLocalRef( cls);
+	env->PopLocalFrame( NULL);
+
+	if (env->ExceptionOccurred()) {
+		__android_log_print(2, "drawIndicText:draw_bitmap", "%s\n",
+				"error occurred copying array back");
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+	}
+}
 jboolean mtcDrawToBitmap
 (JNIEnv * env, jobject thiz, jint textSize, jint width, jint height, jstring srcText, jobject lock)
 {
-	__android_log_print(2, "mtc", "drawToBitmap entered width - %d, height - %d", width, height);
+	__android_log_print(2, "mtc", "drawToBitmap entered width=%d, height=%d", width, height);
 
 	int buff_size = width * height;
 	MTC::Util::FontOption fo(textSize, 0x00000000, 0x00FFFFFF);
@@ -65,7 +128,7 @@ jboolean mtcDrawToBitmap
 	}
 	else
 	{
-		__android_log_print(2, "drawToBitmap", "%s", "method drawBitmap - success");
+		 __android_log_print(2, "drawToBitmap", "%s", "method drawBitmap - success");
 	}
 
 
