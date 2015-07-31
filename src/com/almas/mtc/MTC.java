@@ -200,6 +200,13 @@ public class MTC extends EditText {
 			nativeLayoutSetText(mNativeLayout, getText().toString());
 			nativeLayoutBreakLine(mNativeLayout, height);
 			nativeLayoutDrawToBitmap(mNativeLayout, width, height, 0, 0);
+			
+			int charPos = getSelectionStart();
+			long charLoc = nativeLayoutGetCharLocation(mNativeLayout, charPos, false);
+			mCursorPos = new Point();
+			mCursorPos.y = (int)(charLoc & 0x0FFFFFFFFL) + getPaddingTop();
+			mCursorPos.x = (int)((charLoc & 0xFFFFFFFF00000000L) >>> 32) + getPaddingLeft();
+			
 //			if(width > 0 && height > 0)
 //			{
 //				
