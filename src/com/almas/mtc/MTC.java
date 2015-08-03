@@ -281,11 +281,7 @@ public class MTC extends EditText {
 //					);
 //			}
 			//获取新的坐标
-			int charPos = getSelectionStart();
-			long charLoc = nativeLayoutGetCharLocation(mNativeLayout, charPos, false);
-			mCursorPos = new Point();
-			mCursorPos.y = (int)(charLoc & 0x0FFFFFFFFL) + getPaddingTop();
-			mCursorPos.x = (int)((charLoc & 0xFFFFFFFF00000000L) >>> 32) + getPaddingLeft();
+		
 			// add by he
 			moveCursor(mCursorPos.x, mCursorPos.y);
 		}
