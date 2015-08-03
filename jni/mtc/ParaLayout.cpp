@@ -38,23 +38,6 @@ namespace MTC{	namespace LayoutEngine{
 #endif
 	}
 
-
-	static inline void icu_itemizer(const uint16_t *text, int length, std::vector<Run>& runList)
-	{
-		runList.clear();
-
-		ScriptRunIterator runIter(utf16_to_uchar(text), 0, length);
-
-		while (runIter.next())
-		{
-			int32_t     start = runIter.getScriptStart();
-			int32_t     end = runIter.getScriptEnd();
-			UScriptCode code = runIter.getScriptCode();
-			hb_script_t script = hb_icu_script_to_script(code);
-			runList.emplace_back(start, end - start, script);
-		}
-	}
-
 	static void icu_breaker(const uint16_t* text, int length, std::vector<Break>& breakList)
 	{
 		Breaker *brkItor = new IcuBreaker(BT_LINE);
@@ -197,10 +180,9 @@ namespace MTC{	namespace LayoutEngine{
 #if defined (_DEBUG)
 			int temp_line_width = get_chars_width(start, end);
 			assert(line_width == temp_line_width);
+			str_line_list.emplace_back(_text.c_str() + start, _text.c_str() + end);
 #endif
 			_line_list.emplace_back(start, end, line_width);
-			
-			str_line_list.emplace_back(_text.c_str() + start, _text.c_str() + end);
 
 			start = end;
 			i++;
@@ -258,12 +240,7 @@ namespace MTC{	namespace LayoutEngine{
 
 	void	ParaLayout::itemize()
 	{
-#if defined ICU
-		icu_itemizer(const_char16_to_uint16(&_text[0]), _text.size(), _run_list);
-#else
 		mtc_itemizer(const_char16_to_uint16(&_text[0]), _text.size(), _run_list);
-#endif
-		
 	}
 
 	void	ParaLayout::shape()
@@ -467,10 +444,11 @@ namespace MTC{	namespace LayoutEngine{
 		std::vector<text_line>::iterator itor = _line_list.begin();
 		int buff_size = width * height;
 		int l = 0;
+		int descender = fontOption->Descender();
 		for (; itor != _line_list.end(); ++itor)
 		{
 				
-			draw_chars(buffer, width, height, itor->_start, itor->_end, x + l, y);
+			draw_chars(buffer, width, height, itor->_start, itor->_end, x + l - descender, y);
 				
 			/*实验用的代码，画出字符边界*/
 			int h = 0;
@@ -541,7 +519,7 @@ namespace MTC{	namespace LayoutEngine{
 
 			if (dir == HB_DIRECTION_TTB)
 			{
-				int fit_height = (fontOption->ft_face[FontOption::OTHER]->ascender - fontOption->ft_face[FontOption::OTHER]->descender) >> 6;
+				int fit_height = (fontOption->ft_face[FontOption::OTHER]->size->metrics.ascender - fontOption->ft_face[FontOption::OTHER]->size->metrics.descender) >> 6;
 				offset_x = (*itor).x_offset / 64 + fit_height / 2;
 			}
 			else
@@ -565,7 +543,7 @@ namespace MTC{	namespace LayoutEngine{
 				bmp_ptr = &newBmp;
 			}
 			FreeTypeDrawBitmap(buffer, width, height, DARW_MODE_TRANSPARENT, bmp_ptr,
-				pen_x + bit_left + offset_x - fontOption->Descender(),
+				pen_x + bit_left + offset_x,
 				pen_y - bit_top - offset_y, fontOption->fore, fontOption->back);
 
 			if (dir != HB_DIRECTION_TTB)
