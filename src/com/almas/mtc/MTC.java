@@ -1,13 +1,18 @@
 package com.almas.mtc;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.text.Editable;
+import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -34,12 +39,16 @@ public class MTC extends EditText {
 	// add by he
 	private final PopupWindow mCursor;
 	private CursorController cursorController = new CursorController();
+	protected int mFontSpacing;
+	protected int mDensity = (int) getResources().getDisplayMetrics().density;
+	protected TextPaint mPaint;
+	protected int fontsize=30;
 	
 	public MTC(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.addTextChangedListener(new MyTextWatcher() );
 		// TODO Auto-generated constructor stub
-		mNativeFont =  nativeFontCreate(80, Color.BLACK, Color.WHITE);
+		mNativeFont =  nativeFontCreate(fontsize*mDensity, Color.BLACK, Color.WHITE);
 		mNativeLayout = nativeLayoutCreate(mNativeFont);
 		String text = getText().toString();
 		if(text.length() > 0)
@@ -47,15 +56,23 @@ public class MTC extends EditText {
 			nativeLayoutSetText(mNativeLayout, text);
 		}
 		//add by he
+		mPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		mPaint.setTextSize(mPrefs.getInt("40",
+				fontsize)*mDensity);
+		mPaint.setTypeface(Typeface.createFromAsset(context.getAssets(),
+				"MongolianWhite.ttf"));
 		View view = new View(context);
 		view.setBackgroundColor(Color.BLUE);
+		mFontSpacing = (int) mPaint.getFontSpacing();
 		mCursor = new PopupWindow(view);
 	}
 	public MTC(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.addTextChangedListener(new MyTextWatcher() );
 		// TODO Auto-generated constructor stub
-		mNativeFont =  nativeFontCreate(80, Color.BLACK, Color.WHITE);
+		mNativeFont =  nativeFontCreate(fontsize*mDensity, Color.BLACK, Color.WHITE);
 		mNativeLayout = nativeLayoutCreate(mNativeFont);
 		String text = getText().toString();
 		if(text.length() > 0)
@@ -63,6 +80,13 @@ public class MTC extends EditText {
 			nativeLayoutSetText(mNativeLayout, text);
 		}
 		//add by he
+		mPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		mPaint.setTextSize(mPrefs.getInt("40",
+				fontsize)*mDensity);
+		mPaint.setTypeface(Typeface.createFromAsset(context.getAssets(),
+				"MongolianWhite.ttf"));
 		View view = new View(context);
 		view.setBackgroundColor(Color.BLUE);
 		mCursor = new PopupWindow(view);
@@ -71,7 +95,7 @@ public class MTC extends EditText {
 		super(context);
 		this.addTextChangedListener(new MyTextWatcher() );
 		// TODO Auto-generated constructor stub
-		mNativeFont =  nativeFontCreate(80, Color.BLACK, Color.WHITE);
+		mNativeFont =  nativeFontCreate(fontsize*mDensity, Color.BLACK, Color.WHITE);
 		mNativeLayout = nativeLayoutCreate(mNativeFont);
 		String text = getText().toString();
 		if(text.length() > 0)
@@ -79,6 +103,13 @@ public class MTC extends EditText {
 			nativeLayoutSetText(mNativeLayout, text);
 		}
 		//add by he
+		mPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		mPaint.setTextSize(mPrefs.getInt("40",
+				fontsize)*mDensity);
+		mPaint.setTypeface(Typeface.createFromAsset(context.getAssets(),
+				"MongolianWhite.ttf"));
 		View view = new View(context);
 		view.setBackgroundColor(Color.BLUE);
 		mCursor = new PopupWindow(view);
@@ -135,15 +166,15 @@ public class MTC extends EditText {
 
 		if(mBmp != null)
 			canvas.drawBitmap(mBmp, this.getPaddingLeft(), getPaddingTop(), null);
-		
-		if(mCursorPos != null)
+		// add by Notes
+	/*	if(mCursorPos != null)
 		{
 			Paint p = new Paint();
 			p.setColor(Color.BLUE);
 			
 			canvas.drawLine(mCursorPos.x, mCursorPos.y, mCursorPos.x + 50, mCursorPos.y, p);
 			canvas.drawLine(mCursorPos.x, mCursorPos.y+1, mCursorPos.x + 50, mCursorPos.y+1, p);
-		}
+		}*/
 	}
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -165,6 +196,7 @@ public class MTC extends EditText {
     	//checkLineEnd();
     }
     private Point mCursorPos;
+    private Canvas canvas;
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
@@ -193,12 +225,27 @@ public class MTC extends EditText {
 		mCursorPos = new Point();
 		mCursorPos.y = (int)(charLoc & 0x0FFFFFFFFL) + getPaddingTop();
 		mCursorPos.x = (int)((charLoc & 0xFFFFFFFF00000000L) >>> 32) + getPaddingLeft();
+		cursorController.show(mCursorPos.x, mCursorPos.y);
 		Log.v("MTC", String.format("p=%d,t=%d,touchX=%d,touchY=%d,charX=%d,charY=%d", charPos, trailing?1:0, x, y, mCursorPos.x, mCursorPos.y));
 		boolean ret = super.onTouchEvent(event);
 		setSelection(charPos + (trailing ? 1 : 0));
+		// add by he
+		moveCursor(mCursorPos.x, mCursorPos.y);
+		// end by
 		return ret;
 	}
+	private void moveCursor(int x,int y) {
+		int[] viewCoords = new int[2];
+		this.getLocationInWindow(viewCoords);
+		mFontSpacing = (int) mPaint.getFontSpacing();
+		mCursor.setWidth(mFontSpacing);
+		mCursor.setHeight(1 * mDensity);
+		cursorController.hide();
 
+		cursorController.show(x + viewCoords[0], y
+				+ viewCoords[1]);
+
+	}
 	class MyTextWatcher implements TextWatcher
 	{
 
@@ -226,6 +273,14 @@ public class MTC extends EditText {
 //						getText().toString(), lock
 //					);
 //			}
+			//获取新的坐标
+			int charPos = getSelectionStart();
+			long charLoc = nativeLayoutGetCharLocation(mNativeLayout, charPos, false);
+			mCursorPos = new Point();
+			mCursorPos.y = (int)(charLoc & 0x0FFFFFFFFL) + getPaddingTop();
+			mCursorPos.x = (int)((charLoc & 0xFFFFFFFF00000000L) >>> 32) + getPaddingLeft();
+			// add by he
+			moveCursor(mCursorPos.x, mCursorPos.y);
 		}
 
 		@Override
@@ -240,6 +295,7 @@ public class MTC extends EditText {
 		private boolean showing = false;
 		int x;
 		int y;
+		int[] viewCoords = new int[2];
 		private final Runnable mHider = new Runnable() {
 			@Override
 			public void run() {
@@ -252,13 +308,14 @@ public class MTC extends EditText {
 		};
 
 		CursorController() {
+			getLocationInWindow(viewCoords);
 		}
 
 		public void show(int x, int y) {
 			this.x = x;
 			this.y = y;
 			showing = true;
-			mCursor.showAtLocation(this, Gravity.NO_GRAVITY, x, y);
+			mCursor.showAtLocation(getRootView(), Gravity.NO_GRAVITY, x+ viewCoords[0], y+viewCoords[1]);
 			hideDelayed(DELAY_BEFORE_FADE_OUT);
 		}
 		public void hide() {
