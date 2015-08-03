@@ -1,8 +1,6 @@
 #include "util.h"
 #include <vector>
 #include <algorithm>
-#include <android/log.h>
-
 namespace MTC{	namespace Util{
 #if  defined (ANDROID)
 	const char* fontName[] = { 
@@ -37,28 +35,20 @@ namespace MTC{	namespace Util{
 		*/
 		int line_gap0 = (ft_face[0]->size->metrics.height - ft_face[0]->size->metrics.ascender) >> 6;
 		int line_gap1 = (ft_face[1]->size->metrics.height - ft_face[1]->size->metrics.ascender) >> 6;
-		return max_ascender - min_descender + std::max(line_gap0, line_gap1);
+		return max_ascender - min_descender /*+ std::max(line_gap0, line_gap1)*/;
 	}
 	FontOption::FontOption(int size, int fore_, int back_)
 	{
-		__android_log_print(2, "MTC", "FontOption - start size=%d", size);
 		FT_Init_FreeType(&ft_library); /* initialize library */
 		fore = fore_;
 		back = back_;
-		__android_log_print(2, "MTC", "FontOption - start 2");
 		//GetFullPathName(fontName[0], MAX_PATH, fullPath, 0);
 		for (int i = 0; i < 2; i++)
 		{
-			__android_log_print(2, "MTC", "FontOption - start loopi=%d", i);
-			FT_Error error = FT_New_Face(ft_library, fontName[i], 0, &ft_face[i]); /* create face object */
-			if(error != 0)
-			{
-				__android_log_print(2, "MTC", "FontOption - failed to create font %s", fontName[i]);
-			}
+			FT_New_Face(ft_library, fontName[i], 0, &ft_face[i]); /* create face object */
 			FT_Set_Pixel_Sizes(ft_face[i], 0, size); /* set character size */
 			hb_ft_font[i] = hb_ft_font_create(ft_face[i], NULL);
 		}
-		__android_log_print(2, "MTC", "FontOption - end");
 	}
 	FontOption::~FontOption()
 	{
