@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		
 		
 		Context context = getApplicationContext();
 //		copyFontToPackage(context, )
@@ -41,6 +41,8 @@ public class MainActivity extends Activity {
 			}
 		}
 		Log.i("onCreate", String.format("%d copied, %d exits", num_of_copied_file, num_of_exists_file));
+		
+		setContentView(R.layout.activity_main);
 	}
 	private boolean copyFontToPackage(Context context, String fontName)
 	{
