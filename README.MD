@@ -1,6 +1,6 @@
-# Mongolian Text Component
+# Mongolian Text Component for Android
 
-这是一个用c++实现的在Windows上的蒙古文显示软件。
+这是一个用c++实现的在Android上的蒙古文显示软件。
 
 现在的蒙古文UNICODE编码被设计成了需要复杂渲染（选型）引擎的支持才能正确显示的编码。
 可是遗憾的是几乎所有的软件都不支持蒙古文的特殊的选型规则。
