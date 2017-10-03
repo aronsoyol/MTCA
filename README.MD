@@ -15,4 +15,8 @@
 
 ***
 
-Windows版：[https://gitee.com/aronsoyol/MTC](https://gitee.com/aronsoyol/MTC)
+- Windows版：
+
+码云: [https://gitee.com/aronsoyol/MTC](https://gitee.com/aronsoyol/MTC)
+
+github:[https://www.github.com/aronsoyol/mtc](https://www.github.com/aronsoyol/mtc)
